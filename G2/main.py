@@ -48,7 +48,7 @@ with tabs[0]:
     df_vitorias = df_filtrado[df_filtrado['vencedor'] != '-']
     resultados = df_vitorias['vencedor'].value_counts(normalize=True).reset_index()
     resultados.columns = ['Time', 'Porcentagem']
-    resultados['Porcentagem'] *= 100  # opcional: transformar em %
+    resultados['Porcentagem'] *= 100
 
     tipo_grafico = st.radio("Tipo de gráfico:", ["Pizza", "Barra"], horizontal=True)
 
