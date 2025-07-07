@@ -43,26 +43,23 @@ tabs = st.tabs(["Resumo Geral", "Jogos por Estado", "Desempenho por Time",
 
 with tabs[0]:
     st.header("Resumo Geral")
-    st.markdown("Mostra a quantidade de vitórias de cada time e empates no período e filtros selecionados.")
+    st.markdown("Mostra a porcentagem de vitórias de cada time nos jogos filtrados (empates são ignorados).")
 
-    resultados = df_filtrado['vencedor'].replace('-', 'Empate').value_counts().reset_index()
-    resultados.columns = ['Resultado', 'Quantidade']
+    df_vitorias = df_filtrado[df_filtrado['vencedor'] != '-']
+    resultados = df_vitorias['vencedor'].value_counts(normalize=True).reset_index()
+    resultados.columns = ['Time', 'Porcentagem']
+    resultados['Porcentagem'] *= 100  # opcional: transformar em %
 
     tipo_grafico = st.radio("Tipo de gráfico:", ["Pizza", "Barra"], horizontal=True)
 
     if tipo_grafico == "Pizza":
-        fig1 = px.pie(resultados, names='Resultado', values='Quantidade', hole=0.4)
+        fig1 = px.pie(resultados, names='Time', values='Porcentagem', hole=0.4)
     else:
-        fig1 = px.bar(resultados, x='Resultado', y='Quantidade', color='Resultado', text='Quantidade')
-        fig1.update_traces(textposition='outside')
+        fig1 = px.bar(resultados, x='Time', y='Porcentagem', color='Time', text='Porcentagem')
+        fig1.update_traces(texttemplate='%{text:.2f}%', textposition='outside')
 
     st.plotly_chart(fig1, use_container_width=True)
 
-    gols = df_filtrado.groupby('rodada')[['mandante_Placar', 'visitante_Placar']].sum()
-    gols['total'] = gols['mandante_Placar'] + gols['visitante_Placar']
-    fig2 = px.line(gols.reset_index(), x='rodada', y='total', markers=True,
-                   title='Total de Gols por Rodada')
-    st.plotly_chart(fig2, use_container_width=True)
 
 with tabs[1]:
     st.header("Jogos por Estado")
